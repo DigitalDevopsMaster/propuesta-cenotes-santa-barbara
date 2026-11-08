@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cenotes Santa Bárbara — Check-in</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Registro de visitantes para cenotes con aceptación verificada de términos y firma digital.">
+<meta name="theme-color" content="#0d1b1e">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+<!-- ============================================================
+  CONTROL DE ACCESOS · CENOTES + DISCLAIMER FIRMADO
+  Puro HTML + Flexbox + JS vanilla. Sin frameworks ni plugins.
+  Guarda en localStorage (este dispositivo). Tablet-first.
+  Para la versión PWA instalable ver src/pwa/ (mismo código
+  envuelto en documento standalone + manifest + sw.js).
+============================================================ -->
+<style>
+  *{box-sizing:border-box}
+  html{color-scheme:light}
+  body{margin:0;background:#e9f1f1;color:#10262b;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:left}
+  [hidden]{display:none !important}
+  button{font-family:inherit}
+  .app{min-height:100vh;display:flex;flex-direction:column}
+
+  /* Barra superior */
+  .topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:linear-gradient(135deg,#0d1b1e,#14474e);color:#fff;padding:14px 16px}
+  .logo{width:52px;height:52px;flex:0 0 auto;border-radius:16px;font-size:28px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#19b8c7,#0a5e66)}
+  .titles h1{margin:0;font-size:20px}
+  .titles p{margin:2px 0 0;font-size:13px;opacity:.85}
+  .topspace{flex:1}
+  .pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+    color:#fff;border-radius:999px;padding:10px 14px;font-size:14px}
+
+  /* Pestañas */
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:#fff;
+    border-bottom:1px solid #dfe8e8;position:sticky;top:0;z-index:5}
+  .tabs button{flex:0 0 auto;border:1px solid #dfe8e8;background:#fff;border-radius:999px;
+    padding:12px 16px;font-size:15px;font-weight:700;cursor:pointer;min-height:48px}
+  .tabs button.on{background:#10262b;color:#fff;border-color:#10262b}
+
+  .wrap{width:100%;max-width:1180px;margin:0 auto;padding:14px 12px 40px;
+    display:flex;flex-direction:column;gap:14px}
+  .view{display:none;flex-direction:column;gap:14px}
+  .view.on{display:flex}
+
+  /* Layout de columnas: lado a lado en tablet, apilado en teléfono */
+  .cols{display:flex;gap:14px;align-items:flex-start}
+  .col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:14px}
+  @media (max-width:900px){.cols{flex-direction:column}.col{width:100%}}
+
+  .card{background:#fff;border:1px solid #dfe8e8;border-radius:14px;padding:16px}
+  .card h2{margin:0 0 4px;font-size:18px}
+  .card h3{margin:16px 0 6px;font-size:15px}
+  .sub{margin:0 0 10px;color:#5b7378;font-size:13px}
+  .hint{font-size:12.5px;color:#5b7378}
+
+  label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;margin:12px 0 0}
+  label.f small{font-weight:400;color:#5b7378}
+  input[type=text],input[type=tel],input[type=email],input[type=number],
+  input[type=password],select,textarea{
+    width:100%;min-height:48px;padding:11px 12px;font-size:16px;color:#10262b;
+    border:1.5px solid #cfdbdc;border-radius:10px;background:#fff;font-family:inherit}
+  input:focus,select:focus,textarea:focus{outline:3px solid #19b8c7;border-color:#0e7c86}
+  textarea{resize:vertical}
+
+  /* Filas flexibles */
+  .fila{display:flex;gap:10px;flex-wrap:wrap}
+  .fila>*{flex:1 1 0;min-width:150px}
+
+  /* Términos */
+  .terms{border:1.5px solid #cfdbdc;border-radius:10px;background:#fbfdfe;
+    height:300px;overflow:auto;padding:14px;font-size:14px;line-height:1.6}
+  .bar{height:8px;background:#e4eded;border-radius:99px;overflow:hidden;margin:8px 0}
+  .bar i{display:flex;width:0;height:100%;background:linear-gradient(90deg,#19b8c7,#0e7c86)}
+  .check{display:flex;gap:10px;align-items:flex-start;background:#f6fbfb;
+    border:1px solid #dfe8e8;border-radius:10px;padding:12px;margin:8px 0;font-size:14px}
+  .check input{width:24px;height:24px;flex:0 0 auto;margin-top:1px}
+  .check.off{opacity:.55}
+
+  #sig{width:100%;height:220px;border:2px dashed #8fb8bd;border-radius:12px;
+    background:#fff;touch-action:none;cursor:crosshair}
+
+  /* Botones grandes táctiles */
+  .btn{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:800;
+    cursor:pointer;min-height:52px}
+  .btn.big{width:100%;min-height:60px;font-size:18px}
+  .btn.go{background:linear-gradient(135deg,#0e7c86,#08474d);color:#fff}
+  .btn.go:disabled{opacity:.45;cursor:not-allowed}
+  .btn.soft{background:#eef4f4;color:#10262b}
+  .btn.bad{background:#fdecea;color:#d93025}
+  .btn.small{min-height:44px;padding:10px 14px;font-size:14px}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .btnrow .btn{flex:1 1 auto}
+
+  /* Barra de acción fija al fondo en el registro */
+  .actionbar{position:sticky;bottom:10px;z-index:4}
+
+  /* Estadísticas y listas */
+  .stats{display:flex;gap:10px;flex-wrap:wrap}
+  .stat{flex:1 1 0;min-width:150px;background:#0f2e33;color:#fff;border-radius:12px;padding:14px}
+  .stat b{font-size:24px;display:flex}
+  .stat span{font-size:12px;opacity:.85}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;
+    border:1px solid #dfe8e8;border-radius:12px;padding:10px 12px;font-size:14px}
+  .item .grow{flex:1 1 200px;min-width:0}
+  .tag{display:inline-flex;font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px}
+  .tag.in{background:#e6f4ea;color:#0f6c38}
+  .tag.out{background:#eef1f1;color:#43575b}
+
+  .ok{background:linear-gradient(135deg,#0f9d58,#046c3c);color:#fff;border-radius:14px;
+    padding:20px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .ok .folio{font-size:26px;font-weight:900;letter-spacing:1px;background:rgba(255,255,255,.15);
+    border:1px dashed rgba(255,255,255,.7);border-radius:10px;padding:8px 14px}
+
+  .evid{background:#f2f7f7;border:1px dashed #8fb8bd;border-radius:10px;padding:10px 12px;
+    font-size:12.5px;color:#23474d;margin-top:10px}
+  .firmaimg{width:100%;border:1px solid #cfdbdc;border-radius:10px;background:#fff}
+
+  /* Modal con flex */
+  .overlay{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(10,25,28,.6);
+    display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
+  .modal{background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:92vh;
+    display:flex;flex-direction:column;overflow:hidden}
+  .mhead{display:flex;gap:10px;align-items:center;padding:14px 16px;border-bottom:1px solid #dfe8e8}
+  .mhead h3{margin:0;flex:1;font-size:17px}
+  .mbody{padding:14px 16px;overflow:auto}
+  .kv{display:flex;flex-direction:column;gap:6px;font-size:14px;margin:10px 0}
+  .kv .kvr{display:flex;gap:10px}
+  .kv .k{flex:0 0 130px;color:#5b7378}
+  .kv .v{flex:1;min-width:0;overflow-wrap:anywhere}
+
+  .pinrow{display:flex;gap:8px}
+  .pinrow input{flex:1;min-width:0}
+  /* Asistente en 2 pasos (una pantalla a la vez) */
+  .paso{max-width:780px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:14px}
+  .steps{display:flex;gap:8px}
+  .step{flex:1 1 0;min-width:0;display:flex;gap:10px;align-items:center;background:#eef4f4;
+    border:2px solid transparent;border-radius:12px;padding:10px 12px;font-size:14px}
+  .step .n{width:34px;height:34px;flex:0 0 auto;border-radius:50%;background:#c3d4d5;color:#10262b;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px}
+  .step b{display:flex}
+  .step small{display:flex;color:#5b7378;font-size:12px}
+  .step.on{background:#fff;border-color:#0e7c86}
+  .step.on .n{background:#0e7c86;color:#fff}
+  .step.done .n{background:#0f9d58;color:#fff}
+  .foot{padding:14px;text-align:center;color:#7d979c;font-size:12px}
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="logo">🌀</div>
+    <div class="titles">
+      <h1 id="tEmpresa">Cenotes — Control de Accesos</h1>
+      <p>Registro de ingresos · Términos y disclaimer firmado</p>
+    </div>
+    <div class="topspace"></div>
+    <div class="pill">📅 <span id="tFecha">—</span></div>
+    <button class="pill" id="staffBtn" type="button" style="cursor:pointer">🔒 Staff</button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-v="registro" class="on">📝 Registro</button>
+    <button type="button" data-v="hoy">📋 Hoy 🔒</button>
+    <button type="button" data-v="historial">🗂 Historial 🔒</button>
+    <button type="button" data-v="terminos">📜 Términos 🔒</button>
+    <button type="button" data-v="ajustes">⚙️ Ajustes 🔒</button>
+  </nav>
+
+  <div class="wrap">
+
+    <!-- REGISTRO -->
+    <section class="view on" id="v-registro">
+      <div class="paso">
+        <div class="card">
+          <div class="steps">
+            <div class="step on" id="st1"><div class="n">1</div><div><b>Datos de la visita</b><small>Nombre, tarifa, grupo</small></div></div>
+            <div class="step" id="st2"><div class="n">2</div><div><b>Reglamento y firma</b><small>Lea, acepte y firme</small></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="paso" id="paso1">
+          <div class="card">
+            <h2>1 · Datos de la visita</h2>
+            <p class="sub">Lo llena el visitante en el mostrador o en su celular.</p>
+            <div class="fila">
+              <label class="f">Cenote *<select id="inCenote"></select></label>
+              <label class="f">Tarifa *<select id="inTarifa"></select></label>
+            </div>
+            <div class="fila">
+              <label class="f">Folio de boleto <small>(si ya pagó en caja)</small>
+                <input type="text" id="inBoleto" placeholder="Ej. B-1023" autocomplete="off"></label>
+              <label class="f">Ingreso<input type="text" id="inFecha" readonly></label>
+            </div>
+            <label class="f">Nombre completo del titular *
+              <input type="text" id="inNombre" placeholder="Como aparece en su identificación" autocomplete="name"></label>
+            <div class="fila">
+              <label class="f">Edad *<input type="number" id="inEdad" min="0" max="120" placeholder="Ej. 29"></label>
+              <label class="f">Nacionalidad<input type="text" id="inNac" placeholder="Ej. Mexicana"></label>
+              <label class="f">N° acompañantes<input type="number" id="inNumAcomp" min="0" max="50" value="0"></label>
+            </div>
+            <label class="f">Nombres de acompañantes <small>(uno por línea, incluya menores)</small>
+              <textarea id="inAcomp" rows="3" placeholder="Ej. María López — 12 años"></textarea></label>
+            <div class="fila">
+              <label class="f">Teléfono<input type="tel" id="inTel" placeholder="+52 ..." autocomplete="tel"></label>
+              <label class="f">Email <small>(para enviar comprobante)</small>
+                <input type="email" id="inEmail" placeholder="correo@ejemplo.com" autocomplete="email"></label>
+            </div>
+            <div class="fila">
+              <label class="f">Tipo de ID
+                <select id="inIdTipo">
+                  <option value="">— No presenta —</option>
+                  <option>INE / IFE</option><option>Pasaporte</option>
+                  <option>Licencia de conducir</option><option>Otro</option>
+                </select></label>
+              <label class="f">N° de ID <small>(opcional)</small>
+                <input type="text" id="inIdNum" placeholder="Últimos 4 dígitos si lo prefiere" autocomplete="off"></label>
+            </div>
+            <label class="check" style="margin-top:12px">
+              <input type="checkbox" id="inRepre">
+              <span>Firmo <b>en mi nombre y en representación del grupo / menores a mi cargo</b>. Me hago responsable de que cumplan el reglamento.</span>
+            </label>
+            <div class="btnrow">
+              <button class="btn go big" id="btnPaso2" type="button">Continuar →</button>
+            </div>
+          </div>
+      </div>
+      <div class="paso" id="paso2" hidden>
+          <div class="card">
+            <h2>2 · Lea el reglamento y firme</h2>
+            <p class="sub">Desplace <b>hasta el final</b> del texto para poder aceptar. Medimos el tiempo de lectura como evidencia.</p>
+            <div class="terms" id="termsBox" tabindex="0"></div>
+            <div class="bar"><i id="termsBar"></i></div>
+            <div class="hint" id="termsMsg">Desplace hasta el final para habilitar la aceptación.</div>
+            <label class="check off" id="wAcepta">
+              <input type="checkbox" id="inAcepta" disabled>
+              <span>He leído el <b>Reglamento de uso y Aviso de riesgo</b> (<b id="termsVer">—</b>), acepto los términos y la <b>liberación de responsabilidad</b>. Si incumplo el reglamento se me podrá pedir que abandone el cenote sin reembolso.</span>
+            </label>
+            <label class="check off" id="wReglas">
+              <input type="checkbox" id="inReglas" disabled>
+              <span>Acepto las reglas clave: <b>chaleco obligatorio, ducha antes de entrar, sin bloqueador ni mezclilla, sin alimentos ni bebidas (solo agua), sin clavados, obedecer a guardavidas</b>.</span>
+            </label>
+            <label class="f">Firma manuscrita del titular * <small>(con el dedo o el mouse)</small></label>
+            <canvas id="sig"></canvas>
+            <div class="btnrow">
+              <button class="btn soft small" id="sigBorrar" type="button">🧹 Limpiar firma</button>
+            </div>
+            <div class="hint" id="readMsg" style="margin-top:6px">Tiempo en pantalla: 0 s</div>
+          </div>
+
+          <div class="card actionbar">
+            <div class="hint" id="valMsg">Lea el reglamento hasta el final, marque las casillas y firme.</div>
+            <div class="btnrow">
+              <button class="btn soft" id="btnAtras" type="button">← Atrás</button>
+              <button class="btn go big" id="btnGuardar" type="button" disabled>✅ Firmar y registrar ingreso</button>
+            </div>
+          </div>
+
+      <div class="ok" id="okBox" hidden>
+        <div style="font-size:40px">✅</div>
+        <div><b>Ingreso registrado</b></div>
+        <div class="folio" id="okFolio">—</div>
+        <div class="hint" id="okDesc" style="color:#fff;opacity:.95"></div>
+        <div class="btnrow" style="width:100%">
+          <button class="btn small" id="btnTicket" type="button" style="background:#fff">🖨 Imprimir comprobante</button>
+          <button class="btn small" id="btnNuevo" type="button" style="background:rgba(255,255,255,.2);color:#fff">➕ Nuevo registro</button>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <!-- HOY -->
+    <section class="view" id="v-hoy">
+      <div class="card">
+        <h2>Visitantes de hoy / en sitio</h2>
+        <p class="sub">Quién está dentro ahora mismo.</p>
+        <div class="stats" id="stats"></div>
+      </div>
+      <div class="card">
+        <div class="fila">
+          <label class="f" style="margin:0">Buscar<input type="text" id="qHoy" placeholder="🔎 Nombre, folio o boleto..."></label>
+          <label class="f" style="margin:0">Cenote<select id="fHoyCen"><option value="">Todos</option></select></label>
+        </div>
+        <div class="list" id="hoyList" style="margin-top:10px"></div>
+      </div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="view" id="v-historial">
+      <div class="card">
+        <h2>Historial completo</h2>
+        <p class="sub">Busque por nombre, folio, fecha o cenote. Toque “Ver ficha” para ver la firma y la evidencia.</p>
+        <div class="fila">
+          <label class="f" style="margin:0">Buscar<input type="text" id="qHist" placeholder="🔎 Buscar..."></label>
+          <label class="f" style="margin:0">Fecha <small>(AAAA-MM-DD)</small><input type="text" id="qFecha" placeholder="Vacío = todas"></label>
+          <label class="f" style="margin:0">Cenote<select id="fHistCen"><option value="">Todos</option></select></label>
+        </div>
+        <div class="btnrow">
+          <button class="btn soft small" id="btnCsv" type="button">📥 CSV (Excel)</button>
+          <button class="btn soft small" id="btnBak" type="button">💾 Respaldo</button>
+          <button class="btn soft small" id="btnRes" type="button">📤 Restaurar</button>
+          <input type="file" id="fileRes" accept=".json" hidden>
+          <button class="btn bad small" id="btnDel" type="button">🗑 Borrar todo</button>
+        </div>
+        <div class="list" id="histList" style="margin-top:10px"></div>
+      </div>
+    </section>
+
+    <!-- TERMINOS -->
+    <section class="view" id="v-terminos">
+      <div class="card">
+        <h2>Reglamento y disclaimer</h2>
+        <p class="sub">Cada guardado crea una <b>nueva versión</b>. Cada firma conserva la versión exacta que aceptó.</p>
+        <div class="fila">
+          <label class="f" style="margin:0">Versión actual<input type="text" id="tVer" readonly></label>
+          <label class="f" style="margin:0">Actualizado<input type="text" id="tFecha" readonly></label>
+        </div>
+        <label class="f">Texto del reglamento
+          <textarea id="tEdit" rows="16" style="font-family:ui-monospace,monospace;font-size:13px"></textarea></label>
+        <div class="btnrow">
+          <button class="btn go" id="tSave" type="button">💾 Guardar como nueva versión</button>
+          <button class="btn soft" id="tReset" type="button">↩ Texto modelo</button>
+        </div>
+        <h3>Versiones</h3>
+        <div class="list" id="tHist"></div>
+      </div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="view" id="v-ajustes">
+      <div class="card">
+        <h2>Ajustes de la empresa</h2>
+        <p class="sub">Se guardan en este dispositivo.</p>
+        <label class="f">Nombre de la empresa / parque<input type="text" id="cEmp"></label>
+        <label class="f">Cenotes <small>(uno por línea)</small><textarea id="cCen" rows="4"></textarea></label>
+        <label class="f">Tarifas <small>(una por línea: Nombre | precio)</small><textarea id="cTar" rows="5"></textarea></label>
+        <div class="fila">
+          <label class="f">PIN de staff<input type="text" id="cPin" inputmode="numeric"></label>
+          <label class="f">¿Teléfono obligatorio?
+            <select id="cTel"><option value="no">No, opcional</option><option value="si">Sí, obligatorio</option></select></label>
+        </div>
+        <div class="btnrow"><button class="btn go" id="cSave" type="button">💾 Guardar ajustes</button></div>
+        <div class="evid">🔒 <b>Datos locales:</b> todo se guarda solo en este dispositivo. Usted es responsable de los respaldos y de la Ley de Protección de Datos.</div>
+      </div>
+    </section>
+
+  </div>
+  <footer class="foot">Sistema local de control de accesos · Cada ficha guarda texto aceptado + firma + hora + lectura como evidencia.</footer>
+</div>
+
+<!-- Ficha -->
+<div class="overlay" id="ovFicha" hidden>
+  <div class="modal">
+    <div class="mhead"><h3 id="fichaT">Ficha</h3>
+      <button class="btn soft small" id="fichaX" type="button">✕</button></div>
+    <div class="mbody" id="fichaB"></div>
+  </div>
+</div>
+
+<!-- PIN -->
+<div class="overlay" id="ovPin" hidden>
+  <div class="modal">
+    <div class="mhead"><h3>Acceso de staff</h3></div>
+    <div class="mbody">
+      <p class="sub">PIN para ver Hoy / Historial / Términos / Ajustes. (Demo: <b>1234</b>)</p>
+      <div class="pinrow">
+        <input type="password" id="pinIn" inputmode="numeric" placeholder="PIN">
+        <button class="btn go" id="pinOk" type="button">Entrar</button>
+      </div>
+      <p class="hint" id="pinErr" style="color:#d93025"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* Guardado local (funciona en cualquier navegador, online u offline) */
+var DB = {
+  get: function(k, fb){ try{ var v = localStorage.getItem("cenotes."+k); return v ? JSON.parse(v) : fb; }catch(e){ return fb; } },
+  set: function(k, v){ try{ localStorage.setItem("cenotes."+k, JSON.stringify(v)); }catch(e){ alert("No se pudo guardar (almacenamiento lleno o bloqueado)."); } },
+  del: function(k){ try{ localStorage.removeItem("cenotes."+k); }catch(e){} }
+};
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function hoyISO(d){ d = d || new Date(); return d.toISOString().slice(0,10); }
+function fmtMX(iso){ try{ return new Date(iso).toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"}); }catch(e){ return iso; } }
+function hash(s){ var h=5381,i; for(i=0;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))>>>0; } return h.toString(16); }
+function folio(){ var d=new Date(), p=function(n){return String(n).padStart(2,"0");};
+  return "CEN-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"-"+Math.random().toString(36).slice(2,6).toUpperCase(); }
+function bajar(nombre, texto, tipo){ var b=new Blob([texto],{type:tipo||"text/plain"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=nombre;
+  document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000); }
+function csv(v){ v=String(v==null?"":v); return /[",\n;]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+
+var MODELO =
+"REGLAMENTO DE USO, AVISO DE RIESGO Y LIBERACIÓN DE RESPONSABILIDAD — CENOTES SANTA BÁRBARA, HOMÚN, YUCATÁN\n" +
+"\n1. OBJETO Y ACEPTACIÓN. Al pagar su entrada y firmar este registro, usted acepta este Reglamento en su totalidad. Si no está de acuerdo, no ingrese y solicite reembolso en caja antes de entrar. El desconocimiento de este Reglamento no exime de su cumplimiento.\n" +
+"\n2. RIESGOS. Usted reconoce que nadar en cenotes implica riesgos: agua profunda, zonas oscuras, superficies resbalosas, rocas, fauna, cambios de temperatura y cansancio. Ingresa bajo su propio riesgo. Si no sabe nadar, avise al personal y use chaleco en todo momento.\n" +
+"\n3. REGLAS OBLIGATORIAS (el incumplimiento es causa de llamada de atención y expulsión sin reembolso):\n" +
+"a) Chaleco salvavidas OBLIGATORIO durante todo el recorrido.\n" +
+"b) PROHIBIDO usar bloqueador solar, bronceador, repelente, maquillaje o cualquier químico. Ducha OBLIGATORIA antes de entrar a cada cenote.\n" +
+"c) PROHIBIDO nadar con ropa de mezclilla y usar aletas.\n" +
+"d) PROHIBIDO ingresar bajo efectos de alcohol o drogas. PROHIBIDO introducir neveras, alimentos (incluye snacks) y bebidas; solo se permite agua embotellada.\n" +
+"e) PROHIBIDO tirar basura, PROHIBIDO tocar o romper estalactitas, estalagmitas y formaciones.\n" +
+"f) PROHIBIDOS los clavados.\n" +
+"g) PROHIBIDO el ingreso de mascotas.\n" +
+"h) Los menores deben estar acompañados y vigilados por un adulto responsable.\n" +
+"i) Obedezca al personal, a los guardavidas y a la señalización. Una vez que salga del área de cenotes no podrá regresar.\n" +
+"\n4. SALUD. No ingrese con heridas abiertas o infecciones. Avise al personal sobre padecimientos relevantes.\n" +
+"\n5. PERTENENCIAS. La empresa no se hace responsable por objetos perdidos o dañados.\n" +
+"\n6. LIBERACIÓN DE RESPONSABILIDAD. En la medida permitida por la ley, usted libera a la empresa, sus propietarios, empleados y guías de responsabilidad por lesiones, pérdidas o daños derivados del uso de las instalaciones, salvo dolo o negligencia grave imputable a la empresa. Responde por los daños que usted o sus acompañantes/menores causen.\n" +
+"\n7. EXPULSIÓN. Ante conductas que pongan en riesgo a personas, fauna o formaciones, el personal podrá exigir el abandono inmediato sin reembolso. La firma de este registro es evidencia de que usted leyó y aceptó estas condiciones.\n" +
+"\n8. DATOS PERSONALES. Los datos se usan solo para control de accesos, seguridad y evidencia de aceptación. Se conservan en el equipo de registro.\n" +
+"\n9. MENORES Y GRUPO. Quien firma en representación del grupo/menores declara tener facultades para aceptarlo.\n" +
+"\nAl firmar, declaro que leí este documento, que mis datos son verdaderos y que acepto todo lo anterior.";
+
+var DEF = {
+  empresa: "Cenotes Santa Bárbara",
+  cenotes: ["Recorrido completo", "Cenote Cascabel", "Cenote Chacsikín", "Cenote Xooch'", "Cenote Pool Cocom"],
+  /* Precios de DEMOSTRACIÓN: ajustar con las tarifas reales del cliente en Ajustes */
+  tarifas: [{nombre:"Paquete 1 · 3 cenotes",precio:250},{nombre:"Paquete 2 · 3 cenotes + comida",precio:400},{nombre:"Niño",precio:150},{nombre:"Agencia / grupo",precio:220}],
+  pin: "1234", telReq: false
+};
+
+var S = null, T = null, RECS = [];
+var staff = false, seg = 0, maxPct = 0, alFinal = false, ultimo = null, timer = null, empezo = false;
+
+/* ---------- Arranque ---------- */
+function boot(){
+  S = DB.get("settings", null) || JSON.parse(JSON.stringify(DEF));
+  T = DB.get("terms", null);
+  if(!T){ T = {version:1, updatedAt:new Date().toISOString(), text:MODELO,
+    hist:[{version:1,updatedAt:new Date().toISOString(),text:MODELO}]};
+    DB.set("terms", T); }
+  RECS = DB.get("records", []) || [];
+  RECS.sort(function(a,b){ return String(b.createdAt).localeCompare(String(a.createdAt)); });
+  $("tFecha").textContent = new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"});
+  $("inFecha").value = new Date().toLocaleString("es-MX");
+  pintarAjustes(); pintarTerminos(); listas();
+  timer = setInterval(function(){ if(!empezo) return; seg++; $("readMsg").textContent = "Tiempo en pantalla: "+seg+" s"; validar(); }, 1000);
+  tamFirma();
+}
+function guardarTodo(){ DB.set("settings", S); DB.set("terms", T); DB.set("records", RECS); }
+
+/* ---------- Ajustes ---------- */
+function pintarAjustes(){
+  $("tEmpresa").textContent = S.empresa + " — Control de Accesos";
+  $("inCenote").innerHTML = S.cenotes.map(function(c){return "<option>"+esc(c)+"</option>";}).join("");
+  $("inTarifa").innerHTML = S.tarifas.map(function(t){return "<option value=\""+esc(t.nombre)+"\">"+esc(t.nombre)+" — $"+t.precio+"</option>";}).join("");
+  var o = "<option value=\"\">Todos</option>" + S.cenotes.map(function(c){return "<option>"+esc(c)+"</option>";}).join("");
+  $("fHoyCen").innerHTML = o; $("fHistCen").innerHTML = o;
+  $("cEmp").value = S.empresa;
+  $("cCen").value = S.cenotes.join("\n");
+  $("cTar").value = S.tarifas.map(function(t){return t.nombre+" | "+t.precio;}).join("\n");
+  $("cPin").value = S.pin; $("cTel").value = S.telReq ? "si" : "no";
+}
+$("cSave").onclick = function(){
+  var cen = $("cCen").value.split("\n").map(function(s){return s.trim();}).filter(Boolean);
+  var tar = $("cTar").value.split("\n").map(function(s){return s.trim();}).filter(Boolean).map(function(l){
+    var p = l.split("|"); return {nombre:(p[0]||"").trim()||l, precio:Number((p[1]||"").trim())||0};
+  });
+  if($("cPin").value.trim().length < 4){ alert("El PIN debe tener al menos 4 dígitos."); return; }
+  if(!cen.length || !tar.length){ alert("Debe haber al menos un cenote y una tarifa."); return; }
+  S = {empresa:$("cEmp").value.trim()||DEF.empresa, cenotes:cen, tarifas:tar, pin:$("cPin").value.trim(), telReq:$("cTel").value==="si"};
+  guardarTodo(); pintarAjustes(); validar(); alert("Ajustes guardados.");
+};
+
+/* ---------- Términos ---------- */
+function pintarTerminos(){
+  $("termsBox").innerHTML = esc(T.text).replace(/\n/g,"<br>");
+  $("termsVer").textContent = "v"+T.version;
+  $("tVer").value = "v"+T.version+" · hash "+hash(T.text);
+  $("tFecha").value = fmtMX(T.updatedAt);
+  $("tEdit").value = T.text;
+  $("tHist").innerHTML = T.hist.slice().reverse().map(function(h){
+    return '<div class="item"><div class="grow"><b>v'+h.version+'</b> · '+fmtMX(h.updatedAt)+
+      ' · <span class="hint">hash '+hash(h.text)+'</span></div>'+
+      '<button class="btn soft small" type="button" data-ver="'+h.version+'">Ver</button></div>';
+  }).join("") || '<div class="hint">Sin versiones.</div>';
+  var btns = $("tHist").querySelectorAll("button[data-ver]");
+  btns.forEach(function(b){ b.onclick = function(){
+    var h = T.hist.filter(function(x){return x.version == b.getAttribute("data-ver");})[0];
+    abrirFicha("Reglamento v"+h.version, '<div style="white-space:pre-wrap;font-size:13px">'+esc(h.text)+'</div>', null);
+  };});
+  maxPct = 0; alFinal = false;
+  $("termsBox").scrollTop = 0; $("termsBar").style.width = "0%";
+  $("inAcepta").checked = false; $("inReglas").checked = false;
+  $("inAcepta").disabled = true; $("inReglas").disabled = true;
+  $("wAcepta").classList.add("off"); $("wReglas").classList.add("off");
+  $("termsMsg").textContent = "Desplace hasta el final para habilitar la aceptación. Versión: v"+T.version;
+  validar();
+}
+$("termsBox").addEventListener("scroll", function(){
+  empezo = true;
+  var el = $("termsBox"), max = el.scrollHeight - el.clientHeight;
+  var p = max <= 0 ? 100 : Math.min(100, Math.round(el.scrollTop/max*100));
+  if(p > maxPct) maxPct = p;
+  $("termsBar").style.width = p+"%";
+  if(p >= 96 && !alFinal){
+    alFinal = true;
+    $("inAcepta").disabled = false; $("inReglas").disabled = false;
+    $("wAcepta").classList.remove("off"); $("wReglas").classList.remove("off");
+    $("termsMsg").textContent = "✅ Lectura completa (llegó al final). Marque las 2 casillas y firme.";
+  } else if(!alFinal){
+    $("termsMsg").textContent = "Leyendo... "+p+"% — continúe hasta el 100%. Versión: v"+T.version;
+  }
+  validar();
+});
+$("tSave").onclick = function(){
+  var txt = $("tEdit").value.trim();
+  if(txt.length < 200){ alert("El texto parece demasiado corto para un reglamento."); return; }
+  var v = T.hist.length + 1;
+  var h = {version:v, updatedAt:new Date().toISOString(), text:txt};
+  T = {version:v, updatedAt:h.updatedAt, text:txt, hist:T.hist.concat([h])};
+  guardarTodo(); pintarTerminos(); alert("Guardado como versión v"+v+".");
+};
+$("tReset").onclick = function(){ if(confirm("¿Reemplazar el editor con el texto modelo?")) $("tEdit").value = MODELO; };
+
+/* ---------- Firma ---------- */
+var lienzo = $("sig"), cx = lienzo.getContext("2d"), dib = false, tinta = false;
+function tamFirma(){
+  var r = lienzo.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  var foto = tinta ? lienzo.toDataURL() : null;
+  lienzo.width = Math.max(280, r.width) * dpr; lienzo.height = 220 * dpr;
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  cx.fillStyle = "#fff"; cx.fillRect(0,0,r.width,220);
+  cx.strokeStyle = "#8fb8bd"; cx.setLineDash([6,6]); cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(12,190); cx.lineTo(r.width-12,190); cx.stroke(); cx.setLineDash([]);
+  cx.fillStyle = "#7d979c"; cx.font = "12px system-ui"; cx.fillText("Firme aquí", 14, 206);
+  cx.strokeStyle = "#10262b"; cx.lineWidth = 2.4; cx.lineCap = "round"; cx.lineJoin = "round";
+  if(foto){ var im = new Image(); im.onload = function(){ cx.drawImage(im,0,0,r.width,220); }; im.src = foto; }
+}
+function pos(e){ var r = lienzo.getBoundingClientRect(); var t = e.touches ? e.touches[0] : e;
+  return {x:t.clientX-r.left, y:t.clientY-r.top}; }
+lienzo.addEventListener("pointerdown", function(e){ dib = true; tinta = true; empezo = true;
+  cx.beginPath(); var p = pos(e); cx.moveTo(p.x, p.y);
+  try{ lienzo.setPointerCapture(e.pointerId); }catch(_){} validar(); });
+lienzo.addEventListener("pointermove", function(e){ if(!dib) return; var p = pos(e); cx.lineTo(p.x,p.y); cx.stroke(); });
+window.addEventListener("pointerup", function(){ dib = false; validar(); });
+$("sigBorrar").onclick = function(){ tinta = false; tamFirma(); validar(); };
+window.addEventListener("resize", tamFirma);
+
+/* ---------- Validación y guardado ---------- */
+["inNombre","inEdad","inTel","inAcomp","inNumAcomp","inCenote","inTarifa"].forEach(function(id){
+  $(id).addEventListener("input", function(){ empezo = true; validar(); }); $(id).addEventListener("change", validar);
+});
+$("inAcepta").addEventListener("change", validar);
+$("inReglas").addEventListener("change", validar);
+function validar(){
+  var ok = true;
+  if($("inNombre").value.trim().length < 3) ok = false;
+  if($("inEdad").value === "" || +$("inEdad").value < 0 || +$("inEdad").value > 120) ok = false;
+  if(S && S.telReq && $("inTel").value.trim().length < 7) ok = false;
+  if(!alFinal || !$("inAcepta").checked || !$("inReglas").checked) ok = false;
+  if(!tinta || seg < 5) ok = false;
+  $("btnGuardar").disabled = !ok;
+  return ok;
+}
+/* ---------- Asistente en 2 pasos ---------- */
+var pasoActual = 1;
+function pasoValido(){
+  var faltan = [];
+  if($("inNombre").value.trim().length < 3) faltan.push("nombre completo");
+  if($("inEdad").value === "" || +$("inEdad").value < 0 || +$("inEdad").value > 120) faltan.push("edad");
+  if(S && S.telReq && $("inTel").value.trim().length < 7) faltan.push("teléfono");
+  return faltan;
+}
+function irPaso(n){
+  pasoActual = n;
+  $("paso1").hidden = (n !== 1);
+  $("paso2").hidden = (n !== 2);
+  $("st1").classList.toggle("on", n === 1);
+  $("st2").classList.toggle("on", n === 2);
+  $("st1").classList.toggle("done", n === 2);
+  if(n === 2){ tamFirma(); }
+  window.scrollTo(0,0);
+  validar();
+}
+$("btnPaso2").onclick = function(){
+  var f = pasoValido();
+  if(f.length){ alert("Falta completar: " + f.join(", ") + "."); return; }
+  empezo = true; irPaso(2);
+};
+$("btnAtras").onclick = function(){ irPaso(1); };
+$("btnGuardar").onclick = function(){
+  if(!validar()) return;
+  var b = $("btnGuardar"); b.disabled = true; b.textContent = "⏳ Guardando...";
+  var acomp = $("inAcomp").value.split("\n").map(function(s){return s.trim();}).filter(Boolean);
+  var tn = $("inTarifa").value;
+  var tarifa = S.tarifas.filter(function(t){return t.nombre===tn;})[0] || {nombre:tn, precio:0};
+  var ahora = new Date();
+  var r = {
+    folio: folio(), boleto: $("inBoleto").value.trim(),
+    createdAt: ahora.toISOString(), fecha: hoyISO(ahora),
+    hora: ahora.toLocaleTimeString("es-MX"),
+    cenote: $("inCenote").value, tarifa: tarifa.nombre, precio: tarifa.precio,
+    nombre: $("inNombre").value.trim(), edad: Number($("inEdad").value),
+    nacionalidad: $("inNac").value.trim(), tel: $("inTel").value.trim(), email: $("inEmail").value.trim(),
+    idTipo: $("inIdTipo").value, idNum: $("inIdNum").value.trim(),
+    acompanantes: acomp, numAcomp: Number($("inNumAcomp").value) || 0,
+    representa: $("inRepre").checked,
+    termsVersion: T.version, termsHash: hash(T.text), termsText: T.text,
+    lecturaSeg: seg, scrollPct: maxPct, llegoFinal: alFinal,
+    firma: lienzo.toDataURL("image/png"),
+    pantalla: window.innerWidth + "x" + window.innerHeight,
+    salidaAt: null, status: "dentro"
+  };
+  RECS.unshift(r); guardarTodo(); ultimo = r;
+  $("okFolio").textContent = r.folio;
+  $("okDesc").textContent = r.nombre+" · "+r.cenote+" · "+fmtMX(r.createdAt)+" · Términos v"+r.termsVersion+" tras "+r.lecturaSeg+" s de lectura";
+  $("okBox").hidden = false;
+  $("okBox").scrollIntoView();
+  listas();
+  b.disabled = false; b.textContent = "✅ Firmar y registrar ingreso";
+};
+$("btnNuevo").onclick = function(){
+  ["inBoleto","inNombre","inEdad","inNac","inAcomp","inTel","inEmail","inIdNum"].forEach(function(id){ $(id).value = ""; });
+  $("inNumAcomp").value = "0"; $("inIdTipo").value = ""; $("inRepre").checked = false;
+  $("okBox").hidden = true; tinta = false; tamFirma();
+  seg = 0; empezo = false; $("readMsg").textContent = "Tiempo en pantalla: 0 s"; pintarTerminos();
+  $("inFecha").value = new Date().toLocaleString("es-MX");
+  irPaso(1);
+};
+$("btnTicket").onclick = function(){ ticket(ultimo); };
+
+/* ---------- Listas staff ---------- */
+function itemHTML(r){
+  return '<div class="item"><div class="grow"><b>'+esc(r.folio)+'</b> '+
+    '<span class="hint">'+esc(r.boleto || "s/boleto")+'</span><br>'+
+    '<b>'+esc(r.nombre)+'</b> ('+esc(r.edad)+') · '+esc(r.cenote)+'<br>'+
+    '<span class="hint">'+esc(r.tarifa)+' $'+esc(r.precio)+' · '+fmtMX(r.createdAt)+' · Términos v'+r.termsVersion+' · '+r.lecturaSeg+'s</span></div>'+
+    '<div><span class="tag '+(r.status==="dentro"?"in":"out")+'">'+(r.status==="dentro"?"🟢 DENTRO":"⚪ SALIÓ")+'</span></div>'+
+    '<div><button class="btn soft small" type="button" data-folio="'+esc(r.folio)+'">Ver ficha</button></div></div>';
+}
+function engancharFichas(cont){
+  cont.querySelectorAll("button[data-folio]").forEach(function(b){
+    b.onclick = function(){ var r = RECS.filter(function(x){return x.folio===b.getAttribute("data-folio");})[0]; verFicha(r); };
+  });
+}
+function listas(){
+  var h = hoyISO();
+  var deHoy = RECS.filter(function(r){return r.fecha===h;});
+  var dentro = deHoy.filter(function(r){return r.status==="dentro";});
+  var caja = deHoy.reduce(function(a,r){return a+(Number(r.precio)||0);},0);
+  $("stats").innerHTML =
+    '<div class="stat"><b>'+deHoy.length+'</b><span>👥 ingresos hoy ('+h+')</span></div>'+
+    '<div class="stat"><b>'+dentro.length+'</b><span>🟢 dentro ahora mismo</span></div>'+
+    '<div class="stat"><b>$'+caja.toLocaleString("es-MX")+'</b><span>💰 taquilla hoy</span></div>';
+  var q = ($("qHoy").value||"").toLowerCase(), fc = $("fHoyCen").value;
+  var lh = deHoy.filter(function(r){ return (!fc||r.cenote===fc) && (!q||(r.nombre+r.folio+(r.boleto||"")).toLowerCase().indexOf(q)>=0); });
+  $("hoyList").innerHTML = lh.map(itemHTML).join("") || '<div class="hint">Sin registros hoy.</div>';
+  engancharFichas($("hoyList"));
+  var hq = ($("qHist").value||"").toLowerCase(), hd = $("qFecha").value.trim(), hc = $("fHistCen").value;
+  var l2 = RECS.filter(function(r){ return (!hc||r.cenote===hc) && (!hd||r.fecha===hd) &&
+    (!hq||(r.nombre+r.folio+(r.boleto||"")+r.cenote+r.email+r.tel).toLowerCase().indexOf(hq)>=0); }).slice(0,500);
+  $("histList").innerHTML = l2.map(itemHTML).join("") || '<div class="hint">Sin resultados.</div>';
+  engancharFichas($("histList"));
+}
+["qHoy","fHoyCen","qHist","qFecha","fHistCen"].forEach(function(id){ $(id).addEventListener("input", listas); });
+
+/* ---------- Ficha / evidencia ---------- */
+function abrirFicha(titulo, html, r){
+  $("fichaT").textContent = titulo; $("fichaB").innerHTML = html;
+  $("ovFicha").hidden = false;
+  if(!r) return;
+  var s = $("fichaB").querySelector("#fSalida");
+  if(s) s.onclick = function(){ r.salidaAt = new Date().toISOString(); r.status = "salio";
+    guardarTodo(); listas(); $("ovFicha").hidden = true; };
+  $("fichaB").querySelector("#fPrint").onclick = function(){ ticket(r); };
+  $("fichaB").querySelector("#fDel").onclick = function(){
+    if(!confirm("¿Eliminar esta ficha? Se pierde la evidencia.")) return;
+    RECS = RECS.filter(function(x){return x.folio!==r.folio;});
+    guardarTodo(); listas(); $("ovFicha").hidden = true;
+  };
+}
+$("fichaX").onclick = function(){ $("ovFicha").hidden = true; };
+$("ovFicha").addEventListener("click", function(e){ if(e.target === $("ovFicha")) $("ovFicha").hidden = true; });
+function verFicha(r){
+  if(!r) return;
+  var acomp = (r.acompanantes||[]).map(esc).join("<br>") || '<span class="hint">— ninguno —</span>';
+  abrirFicha("Ficha "+r.folio,
+    '<div><span class="tag '+(r.status==="dentro"?"in":"out")+'">'+(r.status==="dentro"?"🟢 DENTRO":"⚪ SALIÓ")+'</span> <b>'+esc(r.nombre)+'</b> · '+esc(r.cenote)+'</div>'+
+    '<div class="kv">'+
+    '<div class="kvr"><div class="k">Folio</div><div class="v"><b>'+esc(r.folio)+'</b></div></div>'+
+    '<div class="kvr"><div class="k">Boleto</div><div class="v">'+esc(r.boleto||"—")+'</div></div>'+
+    '<div class="kvr"><div class="k">Ingreso</div><div class="v">'+fmtMX(r.createdAt)+'</div></div>'+
+    '<div class="kvr"><div class="k">Salida</div><div class="v">'+(r.salidaAt?fmtMX(r.salidaAt):"— aún dentro —")+'</div></div>'+
+    '<div class="kvr"><div class="k">Tarifa</div><div class="v">'+esc(r.tarifa)+' — $'+esc(r.precio)+'</div></div>'+
+    '<div class="kvr"><div class="k">Edad / Nac.</div><div class="v">'+esc(r.edad)+' / '+esc(r.nacionalidad||"—")+'</div></div>'+
+    '<div class="kvr"><div class="k">Tel / Email</div><div class="v">'+esc(r.tel||"—")+' / '+esc(r.email||"—")+'</div></div>'+
+    '<div class="kvr"><div class="k">ID</div><div class="v">'+esc(r.idTipo||"—")+' '+esc(r.idNum||"")+'</div></div>'+
+    '<div class="kvr"><div class="k">Grupo</div><div class="v">'+acomp+(r.representa?'<br><b>Representación del grupo: SÍ</b>':"")+'</div></div>'+
+    '</div>'+
+    '<h3>✍️ Firma del titular</h3><img class="firmaimg" src="'+r.firma+'" alt="firma">'+
+    '<div class="evid">🧾 <b>Evidencia:</b> aceptó el Reglamento <b>v'+r.termsVersion+'</b> (hash <b>'+esc(r.termsHash)+'</b>) el '+fmtMX(r.createdAt)+
+    ', tras <b>'+r.lecturaSeg+' s</b> en pantalla y <b>'+r.scrollPct+'%</b> de desplazamiento'+(r.llegoFinal?" (llegó al final)":"")+'.</div>'+
+    '<details style="margin-top:8px"><summary><b>Ver texto íntegro aceptado (v'+r.termsVersion+')</b></summary>'+
+    '<div style="white-space:pre-wrap;font-size:12.5px;background:#f7fafa;border:1px solid #dfe8e8;border-radius:8px;padding:10px;margin-top:6px">'+esc(r.termsText||"")+'</div></details>'+
+    '<div class="btnrow">'+
+    (r.status==="dentro"?'<button class="btn soft small" id="fSalida" type="button">🚪 Marcar salida</button>':"")+
+    '<button class="btn soft small" id="fPrint" type="button">🖨 Comprobante</button>'+
+    '<button class="btn bad small" id="fDel" type="button">🗑 Eliminar</button></div>', r);
+}
+function ticket(r){
+  if(!r) return;
+  var w = window.open("", "_blank");
+  w.document.write('<html><head><meta charset="utf-8"><title>Comprobante '+esc(r.folio)+'</title>'+
+    '<style>body{font-family:system-ui,Arial,sans-serif;padding:24px;color:#111}'+
+    '.box{border:2px solid #111;border-radius:12px;padding:18px;max-width:560px;margin:auto}'+
+    'img{width:100%;border:1px solid #999;border-radius:8px}.f{font-size:26px;font-weight:900}small{color:#555}</style></head><body>'+
+    '<div class="box"><div>'+esc(S.empresa)+'</div><div class="f">'+esc(r.folio)+'</div>'+
+    '<p><b>'+esc(r.nombre)+'</b> · '+esc(r.cenote)+'<br>Ingreso: '+fmtMX(r.createdAt)+' · '+esc(r.tarifa)+' $'+esc(r.precio)+' · Boleto '+esc(r.boleto||"—")+'</p>'+
+    '<p><small>Aceptó Reglamento v'+r.termsVersion+' (hash '+esc(r.termsHash)+') tras '+r.lecturaSeg+'s. Acompañantes: '+esc((r.acompanantes||[]).join("; ")||"—")+'</small></p>'+
+    '<p><b>Firma:</b></p><img src="'+r.firma+'">'+
+    '<p><small>El incumplimiento del reglamento es causa de expulsión sin reembolso.</small></p></div>'+
+    '<script>onload=function(){print();}<\/script></body></html>');
+  w.document.close();
+}
+
+/* ---------- Exportar / respaldo ---------- */
+$("btnCsv").onclick = function(){
+  var head = ["folio","boleto","fecha","hora","cenote","tarifa","precio","nombre","edad","nacionalidad","tel","email","idTipo","idNum","acompanantes","representa","termsVersion","termsHash","lecturaSeg","scrollPct","llegoFinal","salida","status"];
+  var lin = ["\uFEFF"+head.join(";")];
+  RECS.slice().reverse().forEach(function(r){
+    lin.push([r.folio,r.boleto,r.fecha,r.hora,r.cenote,r.tarifa,r.precio,r.nombre,r.edad,r.nacionalidad,r.tel,r.email,r.idTipo,r.idNum,(r.acompanantes||[]).join(" | "),r.representa?"SI":"NO",r.termsVersion,r.termsHash,r.lecturaSeg,r.scrollPct,r.llegoFinal?"SI":"NO",r.salidaAt||"",r.status].map(csv).join(";"));
+  });
+  bajar("accesos_"+hoyISO()+".csv", lin.join("\n"), "text/csv;charset=utf-8");
+};
+$("btnBak").onclick = function(){
+  bajar("respaldo_accesos_"+hoyISO()+".json", JSON.stringify({app:"cenotes-accesos",exportedAt:new Date().toISOString(),settings:S,terms:T,records:RECS},null,2), "application/json");
+};
+$("btnRes").onclick = function(){ $("fileRes").click(); };
+$("fileRes").addEventListener("change", function(e){
+  var f = e.target.files[0]; if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    try{
+      var d = JSON.parse(rd.result);
+      if(d.settings) S = d.settings;
+      if(d.terms) T = d.terms;
+      if(d.records && d.records.length) RECS = d.records;
+      guardarTodo(); pintarAjustes(); pintarTerminos(); listas();
+      alert("Respaldo restaurado.");
+    }catch(err){ alert("Archivo inválido."); }
+  };
+  rd.readAsText(f);
+});
+$("btnDel").onclick = function(){
+  if(prompt("Escriba BORRAR para eliminar TODOS los registros:","") !== "BORRAR") return;
+  RECS = []; guardarTodo(); listas(); alert("Registros eliminados.");
+};
+
+/* ---------- Pestañas y PIN ---------- */
+document.querySelectorAll("#tabs button").forEach(function(b){
+  b.onclick = function(){
+    var v = b.getAttribute("data-v");
+    if(v !== "registro" && !staff){ $("ovPin").hidden = false; setTimeout(function(){ $("pinIn").focus(); },100); return; }
+    ir(v);
+  };
+});
+function ir(v){
+  document.querySelectorAll("#tabs button").forEach(function(x){ x.classList.toggle("on", x.getAttribute("data-v")===v); });
+  ["registro","hoy","historial","terminos","ajustes"].forEach(function(t){ $("v-"+t).classList.toggle("on", t===v); });
+  if(v === "registro"){ if($("okBox").hidden) irPaso(1); }
+}
+$("staffBtn").onclick = function(){
+  if(staff){ staff = false; $("staffBtn").textContent = "🔒 Staff"; ir("registro"); }
+  else { $("ovPin").hidden = false; setTimeout(function(){ $("pinIn").focus(); },100); }
+};
+$("pinOk").onclick = function(){
+  if($("pinIn").value === S.pin){
+    staff = true; $("pinIn").value = ""; $("pinErr").textContent = "";
+    $("ovPin").hidden = true; $("staffBtn").textContent = "🔓 Staff ✓";
+    document.querySelectorAll("#tabs button").forEach(function(x){
+      x.textContent = x.textContent.replace(" 🔒","");
+    });
+  } else { $("pinErr").textContent = "PIN incorrecto."; }
+};
+$("pinIn").addEventListener("keydown", function(e){ if(e.key === "Enter") $("pinOk").click(); });
+
+boot();
+</script>
+
+<script>
+if ("serviceWorker" in navigator && /^(https?:)?$/.test(location.protocol)) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Propuesta Digital · Cenotes Santa Bárbara</title>
+<meta name="description" content="Propuesta de sitio web, reservas en línea, check-in digital y WhatsApp verificado para Cenotes Santa Bárbara, Homún, Yucatán.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c2226; --ink-2:#3f5a5f; --ink-3:#6c8589;
+  --bg:#f6f3ec; --paper:#ffffff; --line:#e3ddd0;
+  --teal-900:#06363c; --teal-700:#0b5f68; --teal-500:#12a3b0; --teal-300:#7fd6dc; --teal-50:#e6f6f7;
+  --sand:#e9dcc3; --sun:#f2b544; --green:#1f8a55;
+  --radius:18px; --shadow:0 10px 30px rgba(6,54,60,.10);
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:var(--teal-700)}
+h1,h2,h3{font-family:var(--serif);line-height:1.15;margin:0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(28px,4vw,42px)}
+h3{font-size:20px}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+section{padding:88px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700)}
+.eyebrow::before{content:"";width:22px;height:2px;background:currentColor;border-radius:2px}
+.lead{font-size:18px;color:var(--ink-2);max-width:720px;margin-top:14px}
+.head{margin-bottom:40px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:20;background:rgba(246,243,236,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:20px;height:62px}
+.brand{font-family:var(--serif);font-weight:700;font-size:18px;color:var(--teal-900);text-decoration:none;white-space:nowrap}
+.brand span{color:var(--teal-500)}
+.nav ul{display:flex;gap:22px;list-style:none;margin:0 0 0 auto;padding:0}
+.nav ul a{text-decoration:none;color:var(--ink-2);font-size:14px;font-weight:600}
+.nav ul a:hover{color:var(--teal-700)}
+@media(max-width:860px){.nav ul{display:none}}
+
+/* HERO */
+.hero{position:relative;color:#fff;padding:0;overflow:hidden;background:radial-gradient(120% 90% at 85% 10%,#0f6d76 0%,var(--teal-900) 55%,#041f23 100%)}
+.hero .wrap{position:relative;z-index:2;padding-top:72px;padding-bottom:80px;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.hero-photos{position:relative;height:540px}
+.hero-photos img{position:absolute;border-radius:24px;object-fit:cover;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.hero-photos .a{width:72%;height:86%;right:0;top:0}
+.hero-photos .b{width:48%;height:52%;left:0;bottom:0;border:6px solid var(--teal-900)}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr;padding-top:48px}.hero-photos{height:400px}}
+.hero .eyebrow{color:var(--teal-300)}
+.hero h1{font-size:clamp(38px,6.4vw,76px);max-width:900px;margin-top:16px}
+.hero h1 em{font-style:italic;color:var(--teal-300)}
+.hero .lead{color:rgba(255,255,255,.9);font-size:clamp(17px,2vw,20px)}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:999px;font-weight:700;text-decoration:none;font-size:15px;transition:transform .15s ease,box-shadow .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:var(--teal-500);color:#fff;box-shadow:0 8px 24px rgba(18,163,176,.35)}
+.btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.btn.dark{background:var(--teal-900);color:#fff}
+.meta{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:44px;font-size:14px;color:rgba(255,255,255,.8)}
+.meta b{color:#fff;font-weight:600}
+
+/* RESUMEN */
+.summary{background:var(--paper);border-bottom:1px solid var(--line);padding:56px 0}
+.summary .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.summary .k{font-family:var(--serif);font-size:40px;color:var(--teal-700);line-height:1}
+.summary .t{font-weight:700;margin-top:10px}
+.summary .d{color:var(--ink-3);font-size:14px;margin-top:4px}
+@media(max-width:860px){.summary .grid{grid-template-columns:repeat(2,1fr)}}
+
+/* FORTALEZAS */
+.strengths{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.photo-stack{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.photo-stack img{border-radius:var(--radius);aspect-ratio:4/5;object-fit:cover;box-shadow:var(--shadow)}
+.photo-stack img:nth-child(2){margin-top:44px}
+.checks{list-style:none;padding:0;margin:26px 0 0;display:flex;flex-direction:column;gap:14px}
+.checks li{display:flex;gap:14px;align-items:flex-start}
+.checks .ic{flex:0 0 30px;height:30px;border-radius:50%;background:var(--teal-50);color:var(--teal-700);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.checks b{display:block}
+.checks span{color:var(--ink-2);font-size:15px}
+@media(max-width:860px){.strengths{grid-template-columns:1fr}}
+
+/* OPORTUNIDADES */
+.opps{background:var(--paper)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:10px}
+.opps .card{background:var(--bg)}
+.card .num{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--teal-500)}
+.card p{color:var(--ink-2);font-size:15px}
+.card .tag{align-self:flex-start;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--teal-50);color:var(--teal-700);margin-top:auto}
+@media(max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.cards{grid-template-columns:1fr}}
+
+.serp{margin-top:48px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--paper)}
+.serp h3{padding:20px 24px;border-bottom:1px solid var(--line);font-size:18px}
+.serp table{width:100%;border-collapse:collapse;font-size:15px}
+.serp th,.serp td{text-align:left;padding:14px 24px;border-bottom:1px solid var(--line);vertical-align:top}
+.serp th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);background:var(--bg)}
+.serp tr:last-child td{border-bottom:0}
+.serp td:first-child{font-weight:600;white-space:nowrap}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.pill.ok{background:#e3f4ea;color:var(--green)}
+.pill.mid{background:#fdf1d8;color:#9a6a06}
+.serp .note{padding:14px 24px;font-size:13px;color:var(--ink-3);background:var(--bg)}
+@media(max-width:700px){.serp td:first-child{white-space:normal}.serp th,.serp td{padding:12px 14px}}
+
+/* RECORRIDO */
+.journey{background:var(--teal-900);color:#fff}
+.journey .eyebrow{color:var(--teal-300)}
+.journey .lead{color:rgba(255,255,255,.8)}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;counter-reset:s;position:relative}
+.step{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--radius);padding:22px 18px;position:relative}
+.step::before{counter-increment:s;content:counter(s);display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--teal-500);font-weight:800;margin-bottom:14px}
+.step h3{font-size:19px;color:#fff}
+.step p{font-size:14px;color:rgba(255,255,255,.75);margin-top:8px}
+.step .who{display:inline-block;margin-top:12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal-300)}
+@media(max-width:960px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.steps{grid-template-columns:1fr}}
+
+/* MÓDULOS */
+.mods{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.mod{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.mod .ico{width:46px;height:46px;border-radius:14px;background:var(--teal-50);display:flex;align-items:center;justify-content:center}
+.mod .ico svg{width:24px;height:24px;stroke:var(--teal-700);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mod ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:14.5px;display:flex;flex-direction:column;gap:4px}
+.mod .phase{margin-top:auto;font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+.mod.feature{background:linear-gradient(160deg,var(--teal-700),var(--teal-900));color:#fff;border:0}
+.mod.feature .ico{background:rgba(255,255,255,.14)}
+.mod.feature .ico svg{stroke:#fff}
+.mod.feature ul,.mod.feature .phase{color:rgba(255,255,255,.82)}
+@media(max-width:960px){.mods{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.mods{grid-template-columns:1fr}}
+
+/* DEMO */
+.demo{background:var(--paper)}
+.demo-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:44px;align-items:center}
+.device{background:#0b1d20;border-radius:28px;padding:14px;box-shadow:0 30px 60px rgba(6,54,60,.25)}
+.device iframe{width:100%;height:620px;border:0;border-radius:16px;background:#e9f1f1;display:block}
+.howto{counter-reset:h;list-style:none;padding:0;margin:24px 0 0;display:flex;flex-direction:column;gap:14px}
+.howto li{display:flex;gap:14px}
+.howto li::before{counter-increment:h;content:counter(h);flex:0 0 28px;height:28px;border-radius:50%;border:2px solid var(--teal-500);color:var(--teal-700);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.howto span{color:var(--ink-2);font-size:15px}
+.pin{display:inline-block;font-family:ui-monospace,monospace;background:var(--teal-50);color:var(--teal-700);padding:1px 8px;border-radius:6px;font-weight:700}
+.evidence{margin-top:22px;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px dashed var(--teal-300);font-size:14px;color:var(--ink-2)}
+@media(max-width:960px){.demo-grid{grid-template-columns:1fr}.device iframe{height:560px}}
+
+/* ACCESIBILIDAD */
+.access{position:relative;color:#fff;overflow:hidden;background:var(--teal-900)}
+.access img{position:absolute;top:0;right:0;width:50%;height:100%;object-fit:cover}
+@media(max-width:760px){.access img{width:100%}}
+.access::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--teal-900) 0%,var(--teal-900) 48%,rgba(6,54,60,.55) 60%,rgba(6,54,60,0) 80%)}
+@media(max-width:760px){.access::after{background:rgba(6,40,45,.86)}}
+.access .wrap{position:relative;z-index:2}
+.access .box{max-width:560px}
+.access .eyebrow{color:var(--teal-300)}
+.access p{color:rgba(255,255,255,.88);margin-top:16px;font-size:17px}
+.access ul{margin:20px 0 0;padding-left:20px;color:rgba(255,255,255,.88);display:flex;flex-direction:column;gap:6px}
+
+/* PLAN */
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.phase-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;border-top:5px solid var(--teal-500)}
+.phase-card:nth-child(2){border-top-color:var(--teal-700)}
+.phase-card:nth-child(3){border-top-color:var(--teal-900)}
+.phase-card .when{font-size:13px;font-weight:700;color:var(--teal-700);text-transform:uppercase;letter-spacing:.08em}
+.phase-card h3{margin-top:8px}
+.phase-card ul{margin:14px 0 0;padding-left:18px;color:var(--ink-2);font-size:15px;display:flex;flex-direction:column;gap:5px}
+@media(max-width:860px){.timeline{grid-template-columns:1fr}}
+
+/* INVERSIÓN */
+.pricing{background:var(--paper)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
+.plan{border:1px solid var(--line);border-radius:22px;padding:30px 26px;display:flex;flex-direction:column;gap:16px;background:var(--bg);position:relative}
+.plan.rec{background:var(--teal-900);color:#fff;border:0;box-shadow:0 24px 50px rgba(6,54,60,.28);transform:translateY(-8px)}
+.plan .badge{position:absolute;top:-13px;left:26px;background:var(--sun);color:var(--ink);font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;letter-spacing:.04em}
+.plan h3{font-size:24px}
+.plan .desc{font-size:14.5px;color:var(--ink-2)}
+.plan.rec .desc{color:rgba(255,255,255,.78)}
+.price{display:flex;flex-direction:column;gap:2px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.plan.rec .price{border-color:rgba(255,255,255,.18)}
+.price .m{font-family:var(--serif);font-size:38px;line-height:1.1}
+.price .m small{font-family:var(--sans);font-size:15px;font-weight:600;opacity:.75}
+.price .i{font-size:14px;color:var(--ink-3)}
+.plan.rec .price .i{color:rgba(255,255,255,.7)}
+.plan ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px;font-size:14.5px}
+.plan li{display:flex;gap:10px}
+.plan li::before{content:"✓";color:var(--teal-500);font-weight:800}
+.plan.rec li::before{color:var(--teal-300)}
+@media(max-width:960px){.plans{grid-template-columns:1fr}.plan.rec{transform:none}}
+.extras{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+.extra{border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;background:var(--bg)}
+.extra h3{font-size:18px}
+.extra p,.extra ul{color:var(--ink-2);font-size:14.5px;margin-top:8px}
+.extra ul{padding-left:18px;margin-bottom:0}
+@media(max-width:760px){.extras{grid-template-columns:1fr}}
+.fine{margin-top:20px;font-size:13px;color:var(--ink-3)}
+
+/* CIERRE */
+.next{background:linear-gradient(160deg,var(--teal-700),var(--teal-900));color:#fff;text-align:center}
+.next .eyebrow{color:var(--teal-300);justify-content:center}
+.next h2{max-width:760px;margin:14px auto 0}
+.next-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:40px auto 0;max-width:920px;text-align:left}
+.next-steps div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:var(--radius);padding:20px}
+.next-steps b{display:block;font-size:16px}
+.next-steps span{font-size:14px;color:rgba(255,255,255,.78)}
+@media(max-width:760px){.next-steps{grid-template-columns:1fr}}
+.sign{margin-top:44px;font-size:15px;color:rgba(255,255,255,.85)}
+.sign a{color:#fff}
+footer{padding:28px 0;font-size:13px;color:var(--ink-3);text-align:center}
+
+@media print{
+  .nav,.device,.ctas{display:none!important}
+  section{padding:36px 0;break-inside:avoid}
+  .hero{min-height:auto}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#inicio">Santa Bárbara <span>·</span> Propuesta digital</a>
+    <ul>
+      <li><a href="#diagnostico">Diagnóstico</a></li>
+      <li><a href="#solucion">Solución</a></li>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#plan">Plan</a></li>
+      <li><a href="#inversion">Inversión</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="inicio">
+  <div class="wrap">
+   <div>
+    <span class="eyebrow">Propuesta para Cenotes Santa Bárbara · Homún, Yucatán</span>
+    <h1>Que cada visitante <em>reserve, pague y entre</em> sin hacer fila.</h1>
+    <p class="lead">Un sitio web nuevo, conectado con reservas en línea, check-in digital con reglamento firmado y WhatsApp verificado. Todo en un mismo sistema, para vender más de forma directa y conocer a cada cliente.</p>
+    <div class="ctas">
+      <a class="btn primary" href="#demo">Probar la demo de check-in →</a>
+      <a class="btn ghost" href="#inversion">Ver inversión</a>
+    </div>
+    <div class="meta">
+      <span>Fecha: <b>7 de noviembre de 2026</b></span>
+      <span>Vigencia: <b>30 días</b></span>
+      <span>Preparado por: <b>Rainbow</b></span>
+    </div>
+   </div>
+   <div class="hero-photos">
+     <img class="a" src="assets/cenote-cascabel.webp" alt="Visitante flotando en el agua turquesa del Cenote Cascabel, bajo la bóveda de piedra">
+     <img class="b" src="assets/cenote-pool-cocom.webp" alt="Cenote Pool Cocom, abierto, con agua turquesa rodeada de vegetación">
+   </div>
+  </div>
+</header>
+
+<!-- RESUMEN -->
+<div class="summary">
+  <div class="wrap grid">
+    <div><div class="k">1</div><div class="t">Sistema conectado</div><div class="d">Web, reservas, check-in y WhatsApp comparten los mismos datos.</div></div>
+    <div><div class="k">24/7</div><div class="t">Venta en línea</div><div class="d">El visitante reserva y paga a cualquier hora, en español o inglés.</div></div>
+    <div><div class="k">0</div><div class="t">Papeles en taquilla</div><div class="d">Reglamento leído y firmado en tablet o celular, con evidencia guardada.</div></div>
+    <div><div class="k">3</div><div class="t">Fases de entrega</div><div class="d">Primeros resultados en semanas, sin detener la operación.</div></div>
+  </div>
+</div>
+
+<!-- FORTALEZAS -->
+<section>
+  <div class="wrap strengths">
+    <div class="photo-stack">
+      <img src="assets/cenote-chaksikin.webp" alt="Cenote Chacsikín, semiabierto, con estalactitas y barandal de madera">
+      <img src="assets/cenote-xooch.webp" alt="Cenote Xooch' con raíces colgando y luz natural entrando por la apertura">
+    </div>
+    <div>
+      <span class="eyebrow">Punto de partida</span>
+      <h2>Santa Bárbara ya tiene lo más difícil de conseguir.</h2>
+      <p class="lead">Revisamos el sitio actual, su presencia en Google y los materiales que comparten con agencias. La base es sólida y la propuesta se construye sobre ella.</p>
+      <ul class="checks">
+        <li><span class="ic">✓</span><div><b>Marca reconocida en Google</b><span>Al buscar “Cenotes Santa Bárbara” aparecen el sitio oficial y la ficha de Google Maps, que lleva al lugar correcto.</span></div></li>
+        <li><span class="ic">✓</span><div><b>Cuatro cenotes con identidad propia</b><span>Cascabel, Chacsikín, Xooch' y Pool Cocom, con fotografía de gran calidad.</span></div></li>
+        <li><span class="ic">✓</span><div><b>Un diferenciador poco común</b><span>Pool Cocom con elevador para personas con discapacidad, embarazadas y adultos mayores.</span></div></li>
+        <li><span class="ic">✓</span><div><b>Operación con agencias en marcha</b><span>Tarifas 2026, protocolos y modalidades de visita ya definidos.</span></div></li>
+        <li><span class="ic">✓</span><div><b>Interés en la opinión del visitante</b><span>Ya existe una encuesta de satisfacción en el sitio.</span></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- OPORTUNIDADES -->
+<section class="opps" id="diagnostico">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Diagnóstico</span>
+      <h2>Nueve oportunidades para vender más desde el sitio.</h2>
+      <p class="lead">Revisión técnica del sitio actual (HTML, buscadores y contenido) realizada en noviembre de 2026.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><span class="num">01</span><h3>Precios, horarios y ubicación visibles</h3><p>Hoy el visitante necesita escribir por WhatsApp para conocer el costo, el horario o la dirección. Publicarlos responde las búsquedas más frecuentes y reduce mensajes repetidos.</p><span class="tag">Conversión</span></div>
+      <div class="card"><span class="num">02</span><h3>Reserva y pago en línea</h3><p>El sitio termina en un formulario de informes. Un botón de reserva con pago permite cerrar la venta en el momento en que el visitante decide.</p><span class="tag">Ventas directas</span></div>
+      <div class="card"><span class="num">03</span><h3>Venta directa de la marca</h3><p>Al buscar “Cenotes Santa Bárbara” también aparecen Expedia, GetYourGuide y Lokalee vendiendo el recorrido (en Expedia desde US$117 por adulto). Cada venta directa evita la comisión de un intermediario.</p><span class="tag">Margen</span></div>
+      <div class="card"><span class="num">04</span><h3>SEO técnico</h3><p>El sitio funciona sin plugin de SEO: faltan meta descripciones, título principal (H1), datos estructurados para Google y vista previa al compartir en WhatsApp o Facebook. La palabra “Homún” aparece una sola vez.</p><span class="tag">Visibilidad</span></div>
+      <div class="card"><span class="num">05</span><h3>Medición de visitas</h3><p>No encontramos Google Analytics ni Meta Pixel instalados. Con medición se sabe cuántas personas visitan el sitio, desde dónde llegan y cuántas terminan reservando.</p><span class="tag">Datos</span></div>
+      <div class="card"><span class="num">06</span><h3>Versión en inglés completa</h3><p>La versión en inglés omite paquetes y reglamento, está marcada como español para Google y tiene dos portadas duplicadas. El visitante extranjero es una parte importante del público de Homún.</p><span class="tag">Turismo internacional</span></div>
+      <div class="card"><span class="num">07</span><h3>Información unificada</h3><p>El título del sitio menciona 3 cenotes, la portada muestra 4 y los paquetes combinan otros 3. El elevador aparece como disponible en una página y “en etapa 2” en otra. Una sola fuente de datos evita estas diferencias.</p><span class="tag">Confianza</span></div>
+      <div class="card"><span class="num">08</span><h3>Tarifas de agencia protegidas</h3><p>La página de tarifas 2026 para agencias, incluida la tarifa preferencial, es pública y aparece en el mapa del sitio que leen los buscadores. Un portal con acceso privado mantiene esas condiciones solo para socios.</p><span class="tag">Canal agencias</span></div>
+      <div class="card"><span class="num">09</span><h3>Accesibilidad como atractivo</h3><p>Las búsquedas de “cenote con elevador” o “cenote accesible” las encabezan notas de prensa sobre Pool Cocom. Una página propia permite que Santa Bárbara capte directamente a ese público.</p><span class="tag">Diferenciación</span></div>
+    </div>
+
+    <div class="serp">
+      <h3>Dónde aparece Santa Bárbara en Google México</h3>
+      <table>
+        <thead><tr><th>Búsqueda</th><th>Resultado actual</th><th>Objetivo</th></tr></thead>
+        <tbody>
+          <tr><td>Cenotes Santa Bárbara</td><td><span class="pill ok">Primer lugar</span> sitio oficial y ficha de Maps, junto a agencias que revenden el recorrido</td><td>Mantener el primer lugar y llevar al visitante directo a reservar</td></tr>
+          <tr><td>cenotes en Homún precios</td><td><span class="pill mid">Agencias y prensa</span> Tripadvisor, Expedia, Civitatis</td><td>Página de precios y paquetes 2026 del sitio oficial</td></tr>
+          <tr><td>cenote con elevador Yucatán</td><td><span class="pill mid">Prensa</span> notas sobre Pool Cocom</td><td>Página de accesibilidad del sitio oficial</td></tr>
+          <tr><td>best cenotes Homun</td><td><span class="pill mid">Blogs en inglés</span> Santa Bárbara mencionado dentro de listas</td><td>Contenido nativo en inglés con etiquetas de idioma correctas</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Búsquedas realizadas desde México en noviembre de 2026. Las posiciones cambian según ubicación y dispositivo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- RECORRIDO -->
+<section class="journey" id="solucion">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">La solución</span>
+      <h2>Un recorrido completo, desde Google hasta la reseña.</h2>
+      <p class="lead">Cada paso alimenta al siguiente. Los datos que el visitante captura al reservar llegan solos al check-in, al WhatsApp y al panel de ventas.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Encuentra</h3><p>Sitio bilingüe optimizado para Google y Maps, con precios, horarios, cómo llegar y fotos.</p><span class="who">Sitio web + SEO</span></div>
+      <div class="step"><h3>Reserva</h3><p>Elige fecha, horario y paquete. Paga con tarjeta o en línea. El cupo por turno se controla solo.</p><span class="who">Reservas + pagos</span></div>
+      <div class="step"><h3>Confirma</h3><p>Recibe por WhatsApp verificado su código QR, el reglamento y un recordatorio un día antes.</p><span class="who">WhatsApp verificado</span></div>
+      <div class="step"><h3>Llega</h3><p>Muestra su QR, lee y firma el reglamento en tablet o celular. La taquilla ve quién está dentro.</p><span class="who">Check-in digital</span></div>
+      <div class="step"><h3>Recomienda</h3><p>Al terminar recibe una encuesta breve. Quien califica alto recibe la invitación a dejar reseña en Google.</p><span class="who">Encuesta + reseñas</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MÓDULOS -->
+<section>
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Qué incluye</span>
+      <h2>Seis módulos que trabajan juntos.</h2>
+    </div>
+    <div class="mods">
+      <div class="mod">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg></div>
+        <h3>Sitio web nuevo</h3>
+        <ul><li>Diseño a la medida, rápido y pensado para celular</li><li>Español e inglés completos</li><li>Página por cenote, paquetes, restaurante y accesibilidad</li><li>Mapa, horarios, preguntas frecuentes y reglamento</li></ul>
+        <span class="phase">Fase 1</span>
+      </div>
+      <div class="mod">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+        <h3>SEO y analítica</h3>
+        <ul><li>Títulos, descripciones y estructura por página</li><li>Datos estructurados de atracción turística y restaurante</li><li>Google Analytics, Search Console y Meta Pixel</li><li>Optimización de la ficha de Google Business</li></ul>
+        <span class="phase">Fase 1</span>
+      </div>
+      <div class="mod feature">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg></div>
+        <h3>Check-in digital</h3>
+        <ul><li>Registro del titular y su grupo, incluidos menores</li><li>Reglamento con versiones, lectura medida y firma en pantalla</li><li>Panel de visitantes dentro, taquilla del día e historial</li><li>Funciona sin internet en la tablet de taquilla</li></ul>
+        <span class="phase">Fase 1 · Demo disponible</span>
+      </div>
+      <div class="mod">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3"/></svg></div>
+        <h3>Reservas y horarios</h3>
+        <ul><li>Calendario con cupo por turno y por día</li><li>Paquetes 1, 2 y 3 con precios por tipo de visitante</li><li>Pago en línea con confirmación inmediata</li><li>Bloqueo de fechas y temporadas altas</li></ul>
+        <span class="phase">Fase 2</span>
+      </div>
+      <div class="mod">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>WhatsApp verificado</h3>
+        <ul><li>Cuenta oficial verificada con la API de Closer Digital</li><li>Confirmación con QR, recordatorio y reglamento</li><li>Encuesta posterior e invitación a reseñar</li><li>Respuestas rápidas para precios y horarios</li></ul>
+        <span class="phase">Fase 2</span>
+      </div>
+      <div class="mod">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div>
+        <h3>Portal de agencias</h3>
+        <ul><li>Acceso privado con tarifas preferenciales</li><li>Reservas de grupo con número de folio</li><li>Protocolos y modalidades en un solo lugar</li><li>Reporte de visitantes y comisiones por agencia</li></ul>
+        <span class="phase">Fase 3</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="wrap demo-grid">
+    <div>
+      <span class="eyebrow">Demo funcional</span>
+      <h2>Pruebe el check-in de Santa Bárbara.</h2>
+      <p class="lead">Ya está configurado con sus cenotes, sus paquetes y su reglamento. Funciona en tablet, celular o computadora.</p>
+      <ol class="howto">
+        <li><span>Llene los datos de la visita: nombre, edad, paquete y acompañantes.</span></li>
+        <li><span>Desplácese hasta el final del reglamento, marque las casillas y firme con el dedo o el mouse.</span></li>
+        <li><span>Toque <b>Staff</b> e ingrese el PIN <span class="pin">1234</span> para ver quién está dentro, la taquilla del día y el historial.</span></li>
+        <li><span>Abra cualquier ficha para ver la firma, la versión del reglamento aceptada y el tiempo de lectura.</span></li>
+      </ol>
+      <div class="evidence">Cada registro guarda el texto exacto aceptado, la firma, la hora y el tiempo de lectura. Esa evidencia respalda al parque ante cualquier incidente.</div>
+      <div class="ctas" style="margin-top:22px">
+        <a class="btn dark" href="checkin/index.html" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a>
+      </div>
+    </div>
+    <div class="device">
+      <iframe src="checkin/index.html" title="Demo del check-in de Cenotes Santa Bárbara" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESIBILIDAD -->
+<section class="access">
+  <img src="assets/cenote-pool-cocom.webp" alt="" aria-hidden="true">
+  <div class="wrap">
+    <div class="box">
+      <span class="eyebrow">Idea destacada</span>
+      <h2>Pool Cocom, el cenote para toda la familia.</h2>
+      <p>Pocas personas saben que pueden visitar un cenote en silla de ruedas, con un bebé en camino o con los abuelos. Proponemos una página dedicada, en español e inglés, para que esas familias encuentren a Santa Bárbara al buscar en Google.</p>
+      <ul>
+        <li>Fotos y video del elevador y los accesos</li>
+        <li>Recorrido recomendado y servicios cercanos</li>
+        <li>Reserva con aviso de necesidades especiales</li>
+        <li>Difusión con medios y asociaciones de inclusión</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PLAN -->
+<section id="plan">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Plan de trabajo</span>
+      <h2>Tres fases, sin detener la operación.</h2>
+      <p class="lead">El sitio actual sigue en línea hasta que la nueva versión esté lista y revisada.</p>
+    </div>
+    <div class="timeline">
+      <div class="phase-card">
+        <span class="when">Semanas 1 a 4</span>
+        <h3>Presencia y check-in</h3>
+        <ul><li>Sitio nuevo bilingüe con contenido corregido</li><li>SEO técnico, analítica y Google Business</li><li>Check-in digital instalado en taquilla</li><li>Capacitación al personal</li></ul>
+      </div>
+      <div class="phase-card">
+        <span class="when">Semanas 5 a 8</span>
+        <h3>Venta en línea</h3>
+        <ul><li>Reservas con horarios y cupo</li><li>Pagos en línea</li><li>WhatsApp verificado con QR y recordatorios</li><li>Encuesta y solicitud de reseñas</li></ul>
+      </div>
+      <div class="phase-card">
+        <span class="when">Mes 3 en adelante</span>
+        <h3>Crecimiento</h3>
+        <ul><li>Portal de agencias</li><li>Página de accesibilidad y contenido en inglés</li><li>Reporte mensual de ventas y visitas</li><li>Mejoras según los datos</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INVERSIÓN -->
+<section class="pricing" id="inversion">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Inversión</span>
+      <h2>Elija el plan que se ajuste a su operación.</h2>
+      <p class="lead">Una inversión inicial para construir y una mensualidad que cubre servidor, mantenimiento, soporte y la operación de cada sistema.</p>
+    </div>
+    <!-- PRECIOS EDITABLES: ajustar antes de enviar -->
+    <div class="plans">
+      <div class="plan">
+        <h3>Esencial</h3>
+        <p class="desc">Sitio nuevo y check-in digital para ordenar la taquilla.</p>
+        <div class="price"><span class="m">$1,800 <small>MXN / mes</small></span><span class="i">Implementación: $18,000 MXN</span></div>
+        <ul><li>Sitio web bilingüe a la medida</li><li>SEO técnico y analítica</li><li>Optimización de Google Business</li><li>Check-in digital con firma</li><li>Hosting, dominio y certificado SSL</li><li>Mantenimiento y soporte</li></ul>
+      </div>
+      <div class="plan rec">
+        <span class="badge">RECOMENDADO</span>
+        <h3>Reservas</h3>
+        <p class="desc">El recorrido completo: el visitante reserva, paga y llega con su QR.</p>
+        <div class="price"><span class="m">$3,900 <small>MXN / mes</small></span><span class="i">Implementación: $32,000 MXN</span></div>
+        <ul><li>Todo lo del plan Esencial</li><li>Reservas con horarios y cupo</li><li>Pagos en línea</li><li>WhatsApp verificado con QR y recordatorios</li><li>Encuesta y solicitud de reseñas</li><li>Reporte mensual de ventas</li></ul>
+      </div>
+      <div class="plan">
+        <h3>Completo</h3>
+        <p class="desc">Para crecer con agencias y contenido constante.</p>
+        <div class="price"><span class="m">$5,900 <small>MXN / mes</small></span><span class="i">Implementación: $45,000 MXN</span></div>
+        <ul><li>Todo lo del plan Reservas</li><li>Portal privado de agencias</li><li>Página de accesibilidad</li><li>2 artículos SEO al mes</li><li>Panel de ocupación en tiempo real</li><li>Reunión mensual de resultados</li></ul>
+      </div>
+    </div>
+    <div class="extras">
+      <div class="extra">
+        <h3>Opción por desempeño</h3>
+        <p>Implementación reducida y una comisión sobre cada reserva pagada en línea. El costo crece solo cuando crecen las ventas directas.</p>
+      </div>
+      <div class="extra">
+        <h3>Toda mensualidad incluye</h3>
+        <ul><li>Respaldos automáticos y actualizaciones de seguridad</li><li>Cambios de textos, precios y fotos</li><li>Soporte por WhatsApp en horario laboral</li><li>Hasta 1,000 conversaciones de WhatsApp al mes</li></ul>
+      </div>
+    </div>
+    <p class="fine">Precios en pesos mexicanos, más IVA. Las conversaciones de WhatsApp que excedan el límite mensual se cobran según la tarifa vigente de Meta. Las comisiones del procesador de pagos corren por cuenta del parque. Anticipo del 50% para iniciar y 50% a la entrega de cada fase.</p>
+  </div>
+</section>
+
+<!-- CIERRE -->
+<section class="next">
+  <div class="wrap">
+    <span class="eyebrow">Siguientes pasos</span>
+    <h2>Empezamos con una reunión de 45 minutos.</h2>
+    <div class="next-steps">
+      <div><b>1. Validar datos</b><span>Paquetes, precios, horarios, cupo y estado del elevador.</span></div>
+      <div><b>2. Accesos</b><span>Dominio, Google Business y redes sociales, para planear la migración sin interrupciones.</span></div>
+      <div><b>3. Arranque</b><span>Firma, anticipo e instalación del check-in en la primera semana.</span></div>
+    </div>
+    <p class="sign">Rainbow</p>
+  </div>
+</section>
+
+<footer>Propuesta confidencial preparada para Cenotes Santa Bárbara · Noviembre 2026 · Fotografías propiedad de Cenotes Santa Bárbara</footer>
+
+</body>
+</html>
